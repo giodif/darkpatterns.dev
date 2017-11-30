@@ -19295,16 +19295,14 @@ var _darkpattern2 = _interopRequireDefault(_darkpattern);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 (0, _jquery2.default)(function () {
+
     var stage = new _stage2.default(".container");
-    var patterns = [];
 
     for (var i = 0; i < 5; i++) {
-
-        var p = new _darkpattern2.default();
-
-        patterns.push(p);
-        stage.append(p.getView());
+        stage.add(new _darkpattern2.default());
     }
+
+    stage.update();
 });
 
 /***/ }),
@@ -19338,12 +19336,15 @@ var Stage = function () {
         this.$parent = (0, _jquery2.default)(parentSelector);
         this.$self = (0, _jquery2.default)("<div class='stage_container'></div>");
 
+        this.patterns = [];
+
         this.$parent.addClass("stage_parent");
         this.$parent.empty().append(this.$self);
 
         this.$self.on("mouseup.stage_click touchup.stage_click", function (e) {
 
             var o = that.$self.offset();
+            that.update();
             // console.log( { x : e.pageX - o.left, y : e.pageY - o.top } );
         });
     }
@@ -19364,9 +19365,27 @@ var Stage = function () {
             return this.$self;
         }
     }, {
+        key: "add",
+        value: function add(pattern) {
+            this.patterns.push(pattern);
+            this.$self.append(pattern.$self);
+        }
+    }, {
         key: "append",
         value: function append($el) {
             this.$self.append($el);
+        }
+    }, {
+        key: "update",
+        value: function update() {
+
+            for (var i = this.patterns.length - 1; i >= 0; i--) {
+
+                if (this.patterns[i].health <= 0) {
+                    this.patterns.splice(i, 1);
+                    console.log(this.patterns);
+                }
+            }
         }
     }]);
 
@@ -19407,17 +19426,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var rainbow = new _rainbow2.default();
 
 var DarkPattern = function () {
-    function DarkPattern(stage) {
+    function DarkPattern() {
         _classCallCheck(this, DarkPattern);
 
         var that = this;
 
         this.$self = (0, _jquery2.default)("<div class='pattern_generic'></div>");
-        this.stage = stage;
-        this.health = 5;
+        this.health = _rand2.default.num(3, 7);
+        this.__max = this.health;
 
-        this.__width = 0.25;
-        this.__max = 5;
+        console.log(this.health);
+
+        this.__width = 0.25 + _rand2.default.range(-0.2, 0.3);
         this.__aspectRatio = 0.7;
 
         this.x = _rand2.default.range(0, 1 - this.__width);
@@ -19426,9 +19446,9 @@ var DarkPattern = function () {
         this.$self.on("mouseup.stage_click touchup.stage_click", function (e) {
 
             var o = that.$self.offset();
-            console.log({ x: e.pageX - o.left, y: e.pageY - o.top });
+            // console.log( { x : e.pageX - o.left, y : e.pageY - o.top } );
 
-            that.damage(0);
+            that.damage(1);
         });
 
         this.update();
@@ -19460,6 +19480,8 @@ var DarkPattern = function () {
 
             this.health -= count;
 
+            this.update();
+
             if (this.health <= 0) {
                 this.destroy();
             }
@@ -19467,7 +19489,6 @@ var DarkPattern = function () {
     }, {
         key: "destroy",
         value: function destroy() {
-            console.log("destroyed");
             this.$self.remove();
         }
     }, {
@@ -19479,12 +19500,17 @@ var DarkPattern = function () {
         key: "update",
         value: function update() {
             var that = this;
+            var c = rainbow.color(that.health / that.__max, 0, 0.36);
 
             this.$self.css({
                 "width": that.width() + "%",
                 "padding-top": that.height() + "%",
                 "left": that.left() + "%",
-                "top": that.top() + "%"
+                "top": that.top() + "%",
+
+                "border-color": "rgb(" + c.r + "," + c.g + "," + c.b + ")",
+                "border-style": "solid",
+                "border-size": "5px"
             });
         }
     }]);
@@ -19506,10 +19532,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = {
     range: function range(min, max) {
-
-        // console.log( min, max );
-
         return min + Math.random() * (max - min);
+    },
+    num: function num(min, max) {
+        return Math.floor(min) + Math.round(Math.random() * (max - min));
     }
 };
 
