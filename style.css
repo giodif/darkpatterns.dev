@@ -1,0 +1,36 @@
+body{
+    background: #aaa;
+}
+
+.stage_parent{
+    position: relative;
+
+    width: 80%;
+    padding-top: 60%;
+    border: 1px solid #999;
+    margin: 0 auto;
+    background: white;
+}
+
+.stage_container{
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #eee;
+}
+
+.pattern_generic{
+    background: white;
+    position: absolute;
+    box-shadow: 0 5px 5px rgba( 0, 0, 0, 0.4 );
+    border-radius: 5px;
+}
